@@ -1,11 +1,13 @@
 //business logic
 function BankAccount(name, deposit) {
   this.customerName = name;
-  this.initialDeposit = deposit;
+  this.initialDeposit = parseInt(deposit);
 }
 
 BankAccount.prototype.depositWithdraw = function(deposit, withdraw) {
-  return this.initialDeposit + deposit - withdraw;
+  this.actualDeposit = parseInt(deposit);
+  this.actualWithdraw = parseInt(withdraw);
+  return this.initialDeposit + this.actualDeposit - this.actualWithdraw;
 }
 
 //user interface logic
@@ -18,20 +20,31 @@ $(document).ready(function () {
 
     var newCustomer = new BankAccount(inputtedName, inputtedInitialDeposit);
 
-    $("ul#customers").append("<li><span class='customer'>" + newCustomer.customerName + newCustomer.initialDeposit + "</span></li>");
+    $("ul#customers").append("<li><span class='customer'>" + newCustomer.customerName + " " + newCustomer.initialDeposit + "</span></li>");
 
-    $("ul#customers").append('<div class="deposit">' +
-                             '<div class="form-group">' +
-                               '<label for="deposit">Deposit</label>' +
-                               '<input type="text" class="form-control deposit">' +
+    $("ul#customers").append('<form id="current-customer">' +
+                             '<div class="depositWithdraw">' +
+                               '<div class="form-group">' +
+                                 '<label for="deposit">Deposit</label>' +
+                                 '<input type="text" class="form-control deposit">' +
+                               '</div>' +
+                               '<div class="form-group">' +
+                                 '<label for="withdraw">Withdraw</label>' +
+                                 '<input type="text" class="form-control withdraw">' +
+                               '</div>' +
                              '</div>' +
-                             '<div class="form-group">' +
-                               '<label for="withdraw">Withdraw</label>' +
-                               '<input type="text" class="form-control withdraw">' +
-                             '</div>' +
-                           '</div>');
+                            '<button type="submit" class="btn">Submit</button>' +
+                            '</form>');
 
-    $("ul#customers").append('<button type="submit" class="btn">Submit</button>');
 
+    $("ul#customers").submit(function(event) {
+      event.preventDefault();
+      $(".depositWithdraw").each(function() {
+        var inputtedDeposit = $(this).find("input.deposit").val();
+        var inputtedWithdraw = $(this).find("input.withdraw").val();
+        var balance = newCustomer.depositWithdraw(inputtedDeposit, inputtedWithdraw);
+          $("ul#customers").append("<li><span class='customer'>" + balance + "</span></li>");
+      });
+    });
   });
 });
